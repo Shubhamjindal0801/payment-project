@@ -1,16 +1,17 @@
+"use client";
 import { useState } from "react";
-import { useNavigate } from "react-router";
 import styled from "@emotion/styled";
 import axios from "axios";
 import { Button, Form, Input, message } from "antd";
 import { AssetUrls } from "../../common/AssetUrls";
 import { SignupProps } from "../../common/Interface/Signup";
 import { apiContract } from "../../common/apiContract";
-import env from "react-dotenv";
 import { loginProps } from "../../common/Interface/login";
-
 interface HelperProps {
   isCursor?: boolean;
+}
+interface Props {
+  handleLogin: any;
 }
 const Con = styled.div`
   width: 100%;
@@ -60,14 +61,13 @@ const HitButton = styled(Button)`
   left: 50%;
   transform: translateX(-50%);
 `;
-const Signup = () => {
+const Signup = (props: Props) => {
+  const { handleLogin } = props;
   const [formRef] = Form.useForm();
   const [login, setLogin] = useState(false);
   const [email, setEmail] = useState("");
-  const navigate = useNavigate();
 
   const handleUserSignUp = async (values: SignupProps) => {
-    console.log("values", values);
     if (values.password !== values.conPass) {
       message.error("Password doesn't match");
       return;
@@ -84,7 +84,6 @@ const Signup = () => {
         setEmail(values.email);
         formRef.resetFields();
         setLogin(true);
-        console.log(res);
       })
       .catch((err) => {
         console.log(err);
@@ -92,18 +91,18 @@ const Signup = () => {
   };
 
   const handleUserlogin = (values: loginProps) => {
-    console.log("values", values);
+    const payload = {
+      email: values.email,
+      password: values.password,
+    };
     axios
-      .post(`http://localhost:8080${apiContract.login}`, {
-        email: values.email,
-        password: values.password,
-      })
-      .then((res) => {
-        console.log(res);
-        // navigate("/dashboard");
+      .post(`http://localhost:8080${apiContract.login}`, payload)
+      .then((res: any) => {
+        message.success(res.data.message);
+        handleLogin(res.data.data?.token, res.data.data?.creatorId);
       })
       .catch((err) => {
-        console.log(err);
+        message.error(err.response.data.message);
       });
   };
 
@@ -133,7 +132,7 @@ const Signup = () => {
                   ]}
                 >
                   <Input
-                    defaultValue={email}
+                    value={email}
                     type="email"
                     placeholder="johndoe@gmail.com"
                   />
