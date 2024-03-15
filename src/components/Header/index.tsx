@@ -1,11 +1,20 @@
 import React from "react";
 import styled from "@emotion/styled";
 import { motion } from "framer-motion";
-import { LogoutOutlined } from "@ant-design/icons";
-import { Tooltip } from "antd";
+import {
+  HomeOutlined,
+  LogoutOutlined,
+  TransactionOutlined,
+  UserOutlined,
+  UsergroupAddOutlined,
+} from "@ant-design/icons";
+import { Menu, MenuProps, Tooltip } from "antd";
+import { AssetUrls } from "@/common/AssetUrls";
+import colors from "@/common/colors";
 
 interface Props {
-  user: any;
+  currentKey: string;
+  handleMenuItemChange: any;
 }
 const Container = styled(motion.div)`
   display: flex;
@@ -13,7 +22,8 @@ const Container = styled(motion.div)`
   justify-content: space-between;
   align-items: center;
   padding: 15px 20px;
-  background-color: #fff !important;
+  background-color: ${colors.ebonyClay};
+  color: white;
   border-bottom-right-radius: 10px;
   border-bottom-left-radius: 10px;
 `;
@@ -25,16 +35,27 @@ const LogoutContainer = styled.div`
   font-size: 2rem;
 `;
 const LogoutLogo = styled(Tooltip)`
+  span {
+    font-style: italic;
+    font-size: 1.4rem;
+  }
   &:hover {
     cursor: pointer;
   }
 `;
-const UserName = styled.h3`
-  color: #000;
+const MenuItems = styled(Menu)`
+  width: fit-content;
+  padding: 8px 30px;
+  border-radius: 2rem;
+  transform: scale(1.08);
+  background-color: white;
+`;
+const LogoImage = styled.img`
+  width: 60px;
 `;
 
 const Header = (props: Props) => {
-  const { user } = props;
+  const { currentKey, handleMenuItemChange } = props;
   const getName = (name: string) => {
     if (name) {
       const fLetter = name.slice(0, 1).toUpperCase();
@@ -46,22 +67,45 @@ const Header = (props: Props) => {
     localStorage.removeItem("users");
     window.location.href = "/";
   };
+  const items: MenuProps["items"] = [
+    {
+      label: "Home",
+      key: "home",
+      icon: <HomeOutlined />,
+    },
+    {
+      label: "Transaction",
+      key: "transaction",
+      icon: <TransactionOutlined />,
+    },
+    {
+      label: "Groups",
+      key: "groups",
+      icon: <UsergroupAddOutlined />,
+    },
+    {
+      label: "Friends",
+      key: "friends",
+      icon: <UserOutlined />,
+    },
+  ];
   return (
     <Container
       initial={{ opacity: 0, x: -1000 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ duration: 1 }}
     >
-      <span></span>
-      <motion.h1
-        initial={{ opacity: 0, x: -1000 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 1 }}
-      >
-        Len Den
-      </motion.h1>
+      <Tooltip title="Len Den" placement="bottom">
+        <LogoImage src={AssetUrls.APP_LOGO} />
+      </Tooltip>
+      <MenuItems
+        theme="light"
+        mode="horizontal"
+        items={items}
+        selectedKeys={[currentKey]}
+        onClick={handleMenuItemChange}
+      />
       <LogoutContainer>
-        <UserName>{getName(user?.firstName)}</UserName>
         <LogoutLogo title="Logout" placement="bottom">
           <LogoutOutlined onClick={handleLogout} />
         </LogoutLogo>

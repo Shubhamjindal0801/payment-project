@@ -101,8 +101,8 @@ const Signup = (props: Props) => {
         message.success(res.data.message);
         handleLogin(res.data.data?.token, res.data.data?.creatorId);
       })
-      .catch((err) => {
-        message.error(err.response.data.message);
+      .catch((err: any) => {
+        message.error(err.message);
       });
   };
 

@@ -4,36 +4,39 @@ import styled from "@emotion/styled";
 import Header from "../../components/Header";
 import { apiContract } from "@/common/apiContract";
 import axios from "axios";
-import { Menu, MenuProps } from "antd";
-import { HomeOutlined } from "@ant-design/icons";
+import { motion } from "framer-motion";
+import TransitionsMenu from "@/components/TransitionMenu";
+import FriendsMenu from "@/components/FriendsMenu";
+import HomeDefaultMenu from "@/components/HomeDefaultMenu";
+import colors from "@/common/colors";
 
 const Container = styled.div`
   width: 100vw;
   height: 100vh;
-  background-image: linear-gradient(
-      135deg,
-      rgba(107, 107, 107, 0.06) 0%,
-      rgba(107, 107, 107, 0.06) 50%,
-      rgba(202, 202, 202, 0.06) 50%,
-      rgba(202, 202, 202, 0.06) 100%
-    ),
-    linear-gradient(90deg, rgb(20, 20, 20), rgb(20, 20, 20));
-  background-size: 30px 30px;
+  background-color: ${colors.tuna};
+`;
+const Tool = styled(motion.div)`
+  width: 80vw;
+  margin: 0 auto;
+  background-color: ${colors.ebonyClay};
+  color: white;
+  margin-top: 1rem;
+  border-radius: 10px;
+  padding: 5rem 7rem;
 `;
 
 const Dashboard = () => {
-  const [creatorId, setCreatorId] = useState<string>("");
   const [user, setUser] = useState();
+  const [currentKey, setCurrentKey] = useState<string>("friends");
   useEffect(() => {
     const data = localStorage.getItem("users");
     if (data) {
       const dataObj = JSON.parse(data);
-      setCreatorId(dataObj.creatorId);
       fetUserDetails(dataObj.creatorId);
     }
   }, []);
   const fetUserDetails = async (id: string) => {
-    axios
+    await axios
       .get(`http://localhost:8080${apiContract.fetUserDetails}/${id}`)
       .then((res) => {
         console.log("shubham", res.data.data);
@@ -43,17 +46,39 @@ const Dashboard = () => {
         console.log(err);
       });
   };
-  const items: MenuProps["items"] = [
-    {
-      label: "Home",
-      key: "mail",
-      icon: <HomeOutlined />,
-    },
-  ];
+  const handleMenuItemChange = (e: any) => {
+    setCurrentKey(e.key);
+  };
+  const handleTransactionClick = (key: string) => {
+    setCurrentKey(key);
+  };
+  const getTool = () => {
+    switch (currentKey) {
+      case "home":
+        return (
+          <HomeDefaultMenu handleTransactionClick={handleTransactionClick} />
+        );
+      case "transaction":
+        return <TransitionsMenu />;
+      case "friends":
+        return <FriendsMenu />;
+      default:
+        return null;
+    }
+  };
   return (
     <Container>
-      <Header user={user} />
-      <Menu style={{width:'300px'}} mode="horizontal" items={items} />
+      <Header
+        currentKey={currentKey}
+        handleMenuItemChange={handleMenuItemChange}
+      />
+      <Tool
+        initial={{ opacity: 0, x: -1000 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 1 }}
+      >
+        {getTool()}
+      </Tool>
     </Container>
   );
 };
