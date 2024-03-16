@@ -7,6 +7,7 @@ import axios from "axios";
 import { motion } from "framer-motion";
 import TransitionsMenu from "@/components/TransitionMenu";
 import FriendsMenu from "@/components/FriendsMenu";
+import GroupsMenu from "@/components/GroupMenu";
 import HomeDefaultMenu from "@/components/HomeDefaultMenu";
 import colors from "@/common/colors";
 
@@ -27,11 +28,13 @@ const Tool = styled(motion.div)`
 
 const Dashboard = () => {
   const [user, setUser] = useState();
-  const [currentKey, setCurrentKey] = useState<string>("friends");
+  const [creatorId, setCreatorId] = useState<string>("");
+  const [currentKey, setCurrentKey] = useState<string>("home");
   useEffect(() => {
     const data = localStorage.getItem("users");
     if (data) {
       const dataObj = JSON.parse(data);
+      setCreatorId(dataObj.creatorId);
       fetUserDetails(dataObj.creatorId);
     }
   }, []);
@@ -61,7 +64,9 @@ const Dashboard = () => {
       case "transaction":
         return <TransitionsMenu />;
       case "friends":
-        return <FriendsMenu />;
+        return <FriendsMenu creatorId={creatorId} />;
+      case "groups":
+        return <GroupsMenu creatorId={creatorId} />;
       default:
         return null;
     }
