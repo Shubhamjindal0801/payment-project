@@ -7,11 +7,13 @@ import { AssetUrls } from "../../common/AssetUrls";
 import { SignupProps } from "../../common/Interface/Signup";
 import { apiContract } from "../../common/apiContract";
 import { loginProps } from "../../common/Interface/login";
+import { EyeInvisibleOutlined, EyeOutlined } from "@ant-design/icons";
+
 interface HelperProps {
   isCursor?: boolean;
 }
 interface Props {
-  handleLogin: any;
+  handleLogin: (token: string, creatorId: string) => void;
 }
 const Con = styled.div`
   width: 100%;
@@ -66,6 +68,7 @@ const Signup = (props: Props) => {
   const [formRef] = Form.useForm();
   const [login, setLogin] = useState(false);
   const [email, setEmail] = useState("");
+  const [isPassVisible, setIsPassVisible] = useState<boolean>(false);
 
   const handleUserSignUp = async (values: SignupProps) => {
     if (values.password !== values.conPass) {
@@ -104,6 +107,11 @@ const Signup = (props: Props) => {
       .catch((err: any) => {
         message.error(err.message);
       });
+  };
+  const handleLoginSignupSwitch = () => {
+    formRef.resetFields();
+    setIsPassVisible(false);
+    setLogin(!login);
   };
 
   return (
@@ -147,12 +155,26 @@ const Signup = (props: Props) => {
                     },
                   ]}
                 >
-                  <Input type="password" placeholder="Example123" />
+                  <Input
+                    type={isPassVisible ? "text" : "password"}
+                    placeholder="Example123"
+                    suffix={
+                      isPassVisible ? (
+                        <EyeOutlined
+                          onClick={() => setIsPassVisible(!isPassVisible)}
+                        />
+                      ) : (
+                        <EyeInvisibleOutlined
+                          onClick={() => setIsPassVisible(!isPassVisible)}
+                        />
+                      )
+                    }
+                  />
                 </Form.Item>
                 <HitButton htmlType="submit" type="primary">
                   Log in With Email and Password
                 </HitButton>
-                <OrStatement isCursor={true} onClick={() => setLogin(!login)}>
+                <OrStatement isCursor={true} onClick={handleLoginSignupSwitch}>
                   Or Don't Have An Account? Click Here
                 </OrStatement>
               </Form>
@@ -208,7 +230,21 @@ const Signup = (props: Props) => {
                   },
                 ]}
               >
-                <Input type="password" placeholder="Example123" />
+                <Input
+                  type={isPassVisible ? "text" : "password"}
+                  placeholder="Example123"
+                  suffix={
+                    isPassVisible ? (
+                      <EyeOutlined
+                        onClick={() => setIsPassVisible(!isPassVisible)}
+                      />
+                    ) : (
+                      <EyeInvisibleOutlined
+                        onClick={() => setIsPassVisible(!isPassVisible)}
+                      />
+                    )
+                  }
+                />
               </Form.Item>
               <Form.Item
                 name="conPass"
@@ -220,12 +256,26 @@ const Signup = (props: Props) => {
                   },
                 ]}
               >
-                <Input type="password" placeholder="Example123" />
+                <Input
+                  type={isPassVisible ? "text" : "password"}
+                  placeholder="Example123"
+                  suffix={
+                    isPassVisible ? (
+                      <EyeOutlined
+                        onClick={() => setIsPassVisible(!isPassVisible)}
+                      />
+                    ) : (
+                      <EyeInvisibleOutlined
+                        onClick={() => setIsPassVisible(!isPassVisible)}
+                      />
+                    )
+                  }
+                />
               </Form.Item>
               <HitButton htmlType="submit" type="primary">
                 Sign Up With Email and Password
               </HitButton>
-              <OrStatement isCursor={true} onClick={() => setLogin(!login)}>
+              <OrStatement isCursor={true} onClick={handleLoginSignupSwitch}>
                 Or Have An Account Already? Click Here
               </OrStatement>
             </Form>
