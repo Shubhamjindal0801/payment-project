@@ -6,4 +6,6 @@ export const apiContract = {
   addFriend: "/user/add-friend",
   getFriendList: "/user/get-friend-list",
   removeFriend: "/user/remove-friend",
+  createNewGroup: "/user/group/create-group",
+  getGroupList: "/user/group/get-list",
 };

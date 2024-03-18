@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from "react";
 import { CreateGroup } from "@/common/Interface/CreateGroup";
 import { apiContract } from "@/common/apiContract";
 import colors from "@/common/colors";
@@ -5,7 +6,6 @@ import { PlusOutlined } from "@ant-design/icons";
 import styled from "@emotion/styled";
 import { Form, Input, Modal, Select, Upload, message } from "antd";
 import axios from "axios";
-import { useEffect, useState } from "react";
 
 interface Props {
   creatorId: string;
@@ -61,6 +61,7 @@ const ResetButton = styled.div`
 `;
 const LeftSide = styled.div`
   width: 200px;
+  margin-bottom: 4rem;
 `;
 const RightSide = styled.div`
   width: 700px;
@@ -71,9 +72,11 @@ const GroupMenu = (props: Props) => {
   const [formRef] = Form.useForm();
   const [isGroupMenuVisible, setIsGroupMenuVisible] = useState<boolean>(false);
   const [friendoptions, setFriendOptions] = useState<any>([]);
+  const [desc, setDesc] = useState<string>("");
 
   useEffect(() => {
     getFriendList();
+    getGroupList();
   }, []);
 
   const getFriendList = async () => {
@@ -86,15 +89,40 @@ const GroupMenu = (props: Props) => {
         message.error(err.message);
       });
   };
-  const onSubmit = (values: CreateGroup) => {
-    console.log("values", values);
-    return null;
+  const getGroupList = async () => {
+    await axios
+      .get(`http://localhost:8080${apiContract.getGroupList}/${creatorId}`)
+      .then((res) => {
+        console.log("res1", res);
+      })
+      .catch((err) => {
+        message.error(err.message);
+      });
+  };
+  const onSubmit = async (values: CreateGroup) => {
+    await axios
+      .post(
+        `http://localhost:8080${apiContract.createNewGroup}/${creatorId}`,
+        values
+      )
+      .then((res) => {
+        getGroupList();
+        message.success(res.data.message);
+        handleModalClose();
+      })
+      .catch((err) => {
+        message.error(err.message);
+      });
   };
   const handleModalClose = () => {
     formRef.resetFields();
     setIsGroupMenuVisible(false);
   };
-
+  const descriptionSuffix = (
+    <span>
+      {desc?.length > 0 ? desc.length : "0"}/ {50}
+    </span>
+  );
   return (
     <>
       <CreateGroupButton
@@ -108,9 +136,9 @@ const GroupMenu = (props: Props) => {
             title="Create group"
             open={isGroupMenuVisible}
             footer={null}
-            onCancel={handleModalClose}
+            closeIcon={null}
           >
-            <GroupForm layout="vertical" form={formRef}>
+            <GroupForm layout="vertical" form={formRef} onFinish={onSubmit}>
               <LeftSide>
                 <Form.Item name="groupImg">
                   <Upload
@@ -139,7 +167,22 @@ const GroupMenu = (props: Props) => {
                   <GroupNameInput placeholder="Group Name" />
                 </Form.Item>
                 <Form.Item
-                  name="firends"
+                  name="description"
+                  rules={[
+                    {
+                      required: false,
+                    },
+                  ]}
+                >
+                  <GroupNameInput
+                    onChange={(e) => setDesc(e.target.value)}
+                    placeholder="Group Description (optional)"
+                    suffix={descriptionSuffix}
+                    maxLength={50}
+                  />
+                </Form.Item>
+                <Form.Item
+                  name="members"
                   rules={[
                     {
                       required: true,

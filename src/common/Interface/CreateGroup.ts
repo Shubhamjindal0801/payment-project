@@ -1,4 +1,6 @@
 export interface CreateGroup {
   groupName: string;
-  firends: string[];
+  members: string[];
+  description?: string;
+  groupImage?: string;
 }
